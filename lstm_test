@@ -1,0 +1,84 @@
+import tensorflow as tf
+import tkinter as tk
+
+# Define the LSTM model
+model = tf.keras.models.Sequential([
+    tf.keras.layers.LSTM(64, input_shape=(2, 1)),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+# Load the trained weights
+model.load_weights('D:\my_project\models\lstm_model.h5')
+
+# Define the GUI window
+window = tk.Tk()
+window.title("LSTM Model")
+
+# Define the input fields
+label1 = tk.Label(window, text="Input 1:")
+label1.grid(row=0, column=0)
+
+input1 = tk.Entry(window)
+input1.grid(row=0, column=1)
+
+label2 = tk.Label(window, text="Input 2:")
+label2.grid(row=1, column=0)
+
+input2 = tk.Entry(window)
+input2.grid(row=1, column=1)
+
+# Define the output field
+output_label = tk.Label(window, text="Prediction:")
+output_label.grid(row=2, column=0)
+
+output = tk.Label(window, text="")
+output.grid(row=2, column=1)
+
+# Define the predict function
+def predict():
+    # Get the inputs
+    x1 = float(input1.get())
+    x2 = float(input2.get())
+    
+    # Normalize the inputs
+    x1 = (x1 - mean1) / std1
+    x2 = (x2 - mean2) / std2
+    
+    # Reshape the inputs
+    x = tf.constant([[x1], [x2]])
+    x = tf.reshape(x, (1, 2, 1))
+    
+    # Predict the output
+    y = model.predict(x)
+    
+    # Denormalize the output
+    y = y * std3 + mean3
+    
+    # Update the output label
+    output.config(text=str(round(y[0][0], 4)))
+
+# Define the normalize function
+def normalize(x, mean, std):
+    return (x - mean) / std
+
+# Define the denormalize function
+def denormalize(y, mean, std):
+    return y * std + mean
+
+# Define the mean and standard deviation of the inputs
+mean1 = 5.84
+std1 = 0.84
+
+mean2 = 3.06
+std2 = 0.44
+
+# Define the mean and standard deviation of the output
+mean3 = 3.76
+std3 = 1.76
+
+# Define the submit button
+submit = tk.Button(window, text="Predict", command=predict)
+submit.grid(row=3, column=1)
+
+# Start the GUI loop
+window.mainloop()
